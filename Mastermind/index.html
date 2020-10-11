@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>A Number Game</title>
+    <link rel="stylesheet" type="text/css" href="common.css">
+    <style>
+    .dot {
+      height: 20px;
+      width: 20px;
+      background-color: red;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .results{
+      width: 20em;
+      margin: auto;
+    }
+    </style>
+</head>
+
+<script>
+// creates html representation of specified dot
+function MakeDot(colour) {
+  var string = '<span class="dot" style="background-color:';
+  switch (colour) {
+    case 'red':
+      string += '#ff0000';
+      break;
+    case 'green':
+      string += '#00cc00';
+      break;
+    case 'orange':
+      string += '#ff9900';
+      break;
+    default:
+      string += '#bbb';
+      break;
+  }
+  string += ';"></span>';
+  return string;
+}
+</script>
+
+<body>
+<div class="nav" id="nav">
+  <h2>Navigation</h2>
+  <li><a id="game" href="index.html" target="_self">Mastermind</a></li>
+</div>
+<div class="content" id="content">
+  <h1>A Number Game</h1>
+  <div id="info">
+    Maybe you know the game Mastermind. I used to play it with my dad, but at
+    that time we used colour pins instead of numbers. <br/>Even if you know it,
+    there are different versions how you can play it. I made the more difficult
+    one. <br/><br/>
+    You have to guess five numbers, from 0 to 9.<br/>
+    You get hints every round. But the hints are not sorted to fit the order of
+    your inputs. They are simply sorted green, orange, red. <br/>
+    <script>document.write(MakeDot('green'));</script> Green is for a number you guessed
+    correctly and put in the right spot in the number array.<br/>
+    <script>document.write(MakeDot("orange"));</script> Orange is for a number you guessed
+    correctly, but is not in the right spot of the number array.<br/>
+    <script>document.write(MakeDot("red"));</script> Red stands for a number you guessed that
+    doesn't belong in the number array.<br/><br/>
+</div>
+
+<div>
+Numbers:
+<input type="number" min="0" max="9" maxlength="1" size="1" id="number1" autofocus>
+<input type="number" min="0" max="9" maxlength="1" size="1" id="number2">
+<input type="number" min="0" max="9" maxlength="1" size="1" id="number3">
+<input type="number" min="0" max="9" maxlength="1" size="1" id="number4">
+<input type="number" min="0" max="9" maxlength="1" size="1" id="number5">
+<button id="evalBtn" onclick="Evaluate()">Evaluate</button>
+</div>
+
+<div id="results" class="results"><h2>Your Input:</h2></div>
+
+</div>
+
+<script>
+// add enter key as trigger:
+var input = [document.getElementById("number1"),
+document.getElementById("number2"),
+document.getElementById("number3"),
+document.getElementById("number4"),
+document.getElementById("number5")];
+for(i=0; i<input.length; i++){
+  input[i].addEventListener("keyup", function(event) {
+      event.preventDefault();
+      if (event.keyCode === 13) {
+          document.getElementById("evalBtn").click();
+      }
+  });
+}
+
+// generate guessing numbers:
+var goal = [];
+var length = 5;
+goal[0] = Math.floor(Math.random() * 10);
+for(i=1; i<length; ){
+  var val = Math.floor(Math.random() * 10);
+  var flag = true;
+  for(j=0; j<i; j++){
+    if(goal[j] == val){
+      flag = false;
+      break;
+    }
+  }
+  if(flag == false){
+  }else{
+    goal[i]=val;
+    i++;
+  }
+}
+
+var roundCounter = 0;
+
+
+function Evaluate() {
+    // check inputs for validity:
+    if(CheckInputs() == false){
+      return;
+    }
+    roundCounter++;
+
+    // save guessed numbers:
+    var guess = [];
+    for(i=0; i<input.length; i++){
+      guess[i] = parseInt(input[i].value);
+    }
+
+    // compare guessed numbers:
+    var evaluation = [];
+    for(i=0; i<guess.length; i++){
+      if(guess[i] == goal[i]){
+        evaluation[i] = "green";
+      }else if (goal.indexOf(guess[i]) != (-1)) {
+        evaluation[i] = "orange";
+      }else{
+        evaluation[i] = "red";
+      }
+    }
+
+    // sort evaluations (skip this if easy mode)
+    evaluation.sort();
+
+    // make representing dots, check if all numbers were guessed correctly:
+    var correctCount = 0;
+    for(i=0; i<evaluation.length; i++){
+      if(evaluation[i]=="green"){
+        correctCount++;
+      }
+      evaluation[i] = MakeDot(evaluation[i]);
+    }
+
+    // output guesses and evaluation:
+    document.getElementById("results").innerHTML += guess +
+    "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+    evaluation + "</br>";
+
+    // set focus back to first number input:
+    document.getElementById("number1").focus();
+
+    // check if all numbers were guessed correctly:
+    if(correctCount==length){
+      document.getElementById("evalBtn").disabled = true;
+      alert('Woohoo, you did it! \n Took you ' + roundCounter + ' rounds!');
+    }
+  }
+
+// returns true if inputs are valid
+function CheckInputs() {
+  /*(Yes, I know it's risky to set them to the correct value
+  at the beginning)*/
+  // all fields were filled:
+  var all_filled = true;
+  // right ammount of characters per input:
+  var num_of_chars_ok = true;
+  // only number inputs:
+  var only_nums = true;
+
+  for(i=0; i<input.length; i++){
+    if(input[i].value == ""){
+      all_filled = false;
+      break;
+    }
+    if(input[i].value.length > 1){
+      num_of_chars_ok = false;
+      break;
+    }
+    if(isNaN(input[i].value)){
+      only_nums=false;
+      break;
+    }
+  }
+
+  if(all_filled == false){
+    alert('You have to input five numbers');
+    return false;
+  }
+  if(num_of_chars_ok == false){
+    alert('Only one number per input field allowed');
+    return false;
+  }
+  // will probably never be called, still better safe than sorry.
+  if(only_nums == false){
+    alert('You cannot use letters etc.');
+    return false;
+  }
+  return true;
+}
+
+</script>
+
+</body>
+</html>
