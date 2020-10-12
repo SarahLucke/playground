@@ -6,3 +6,7 @@ Snake Game:
 Brickout Game:
 - Try it [here](https://sarahlucke.github.io/playground/BrickOutGame/)
 - View [Code](https://github.com/SarahLucke/playground/BrickOutGame)
+
+Mastermind Game:
+- Try it [here](https://sarahlucke.github.io/playground/Mastermind/)
+- View [Code](https://github.com/SarahLucke/playground/Mastermind)
